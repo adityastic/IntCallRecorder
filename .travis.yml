@@ -16,6 +16,43 @@ android:
   - android-sdk-license-.+
   - google-gdk-license-.+
 
+notifications:
+  email: false
+
+before_cache:
+  - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
+  - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
+cache:
+  directories:
+    - $HOME/.gradle/caches/
+    - $HOME/.gradle/wrapper/
+    - $HOME/.android/build-cache
+
 before_install:
 - yes | sdkmanager "platforms;android-27"
 - yes | sdkmanager "platforms;android-28"
+  - export EMULATOR="system-images;android-21;google_apis;armeabi-v7a" # Used to install/create emulator
+  - echo 'count=0' > /home/travis/.android/repositories.cfg # Avoid warning
+
+install:
+ - echo no | avdmanager create avd -n acib -k "$EMULATOR" -f --abi "$ABI" --tag "$TAG"
+  - emulator -avd acib -engine classic -no-window -camera-back none -camera-front none -verbose -qemu -m 512 &
+  # Start adbd, wait for device connected and show android serial
+  - adb wait-for-device get-serialno
+  # Show version and download Gradle Wrapper if it's not already cached
+  - cd ${TRAVIS_BUILD_DIR}/${DIR} && ./gradlew --version
+
+
+
+before_script:
+  # Wait for emulator fully-booted and disable animations
+  - android-wait-for-emulator
+  - adb shell settings put global window_animation_scale 0 &
+  - adb shell settings put global transition_animation_scale 0 &
+  - adb shell settings put global animator_duration_scale 0 &
+  - sleep 30
+  - adb shell input keyevent 82 &
+
+script:
+  # Run all device checks
+  - cd ${TRAVIS_BUILD_DIR}/${DIR} && ./gradlew connectedCheck
