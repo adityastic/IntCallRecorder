@@ -31,6 +31,6 @@ licenses:
 - android-sdk-license-.+
 - google-gdk-license-.+
 
-install:
-- echo yes | sdkmanager "tools"
-  - echo yes | sdkmanager "platforms;android-25" # Latest platform required by SDK tools
+before_install:
+- yes | sdkmanager "platforms;android-27"
+- yes | sdkmanager "platforms;android-28"
