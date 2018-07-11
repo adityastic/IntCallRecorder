@@ -4,6 +4,8 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import com.adityagupta.intern2.R;
+
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -37,7 +39,7 @@ public class UploadFileAsync extends AsyncTask<String, Void, String> {
             if (sourceFile.isFile()) {
 
                 try {
-                    String upLoadServerUri = "http://192.168.0.9/TestFileUp/hello.php";
+                    String upLoadServerUri = context.getString(R.string.callrecorder__php_link);
 
                     // open a URL connection to the Servlet
                     FileInputStream fileInputStream = new FileInputStream(
@@ -99,7 +101,7 @@ public class UploadFileAsync extends AsyncTask<String, Void, String> {
                     if (serverResponseCode == 200) {
 
                         // messageText.setText(msg);
-                        Log.e("FileUpload Success","YES" + serverResponseMessage);
+                        Log.e("FileUpload Success", "YES" + serverResponseMessage);
                         // recursiveDelete(mDirectory1);
 
                     }
@@ -110,7 +112,7 @@ public class UploadFileAsync extends AsyncTask<String, Void, String> {
                         byte[] bu = new byte[1024];
                         int read;
                         while ((read = in.read(bu)) > 0) {
-                            Log.e("OutputFile",new String(bu, 0, read, "utf-8"));
+                            Log.e("OutputFile", new String(bu, 0, read, "utf-8"));
                         }
                     } finally {
                         in.close();

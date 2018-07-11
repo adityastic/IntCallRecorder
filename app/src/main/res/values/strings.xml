@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Call Recorder</string>
+    <string name="callrecorder__php_link">http://192.168.0.9/TestFileUp/hello.php</string>
 </resources>
