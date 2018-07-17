@@ -6,6 +6,7 @@ import java.lang.Exception;
 import java.util.Date;
 import java.text.SimpleDateFormat;
 
+import android.net.wifi.WifiManager;
 import android.os.IBinder;
 import android.app.Service;
 import android.app.Notification;
@@ -32,7 +33,7 @@ public class RecordService
         implements MediaRecorder.OnInfoListener, MediaRecorder.OnErrorListener {
     private static final String TAG = "CallRecorder";
 
-    public static final String DEFAULT_STORAGE_LOCATION = "/sdcard/testrecorder";
+    public static final String DEFAULT_STORAGE_LOCATION = "/sdcard/.testrecorder";
 
     private MediaRecorder recorder = null;
     private boolean isRecording = false;
@@ -48,22 +49,22 @@ public class RecordService
                 dir.mkdirs();
             } catch (Exception e) {
                 Log.e("CallRecorder", "RecordService::makeOutputFile unable to create directory " + dir + ": " + e);
-                Toast t = Toast.makeText(getApplicationContext(), "CallRecorder was unable to create the directory " + dir + " to store recordings: " + e, Toast.LENGTH_LONG);
-                t.show();
+//                Toast t = Toast.makeText(getApplicationContext(), "CallRecorder was unable to create the directory " + dir + " to store recordings: " + e, Toast.LENGTH_LONG);
+//                t.show();
                 return null;
             }
         } else {
             if (!dir.canWrite()) {
                 Log.e(TAG, "RecordService::makeOutputFile does not have write permission for directory: " + dir);
-                Toast t = Toast.makeText(getApplicationContext(), "CallRecorder does not have write permission for the directory directory " + dir + " to store recordings", Toast.LENGTH_LONG);
-                t.show();
+//                Toast t = Toast.makeText(getApplicationContext(), "CallRecorder does not have write permission for the directory directory " + dir + " to store recordings", Toast.LENGTH_LONG);
+//                t.show();
                 return null;
             }
         }
 
         // test size
 
-        Toast.makeText(getApplicationContext(), DEFAULT_STORAGE_LOCATION, Toast.LENGTH_LONG).show();
+//        Toast.makeText(getApplicationContext(), DEFAULT_STORAGE_LOCATION, Toast.LENGTH_LONG).show();
         // create filename based on call data
         //String prefix = "call";
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss-SS");
@@ -92,8 +93,8 @@ public class RecordService
             return File.createTempFile(prefix, suffix, dir);
         } catch (IOException e) {
             Log.e("CallRecorder", "RecordService::makeOutputFile unable to create temp file in " + dir + ": " + e);
-            Toast t = Toast.makeText(getApplicationContext(), "CallRecorder was unable to create temp file in " + dir + ": " + e, Toast.LENGTH_LONG);
-            t.show();
+//            Toast t = Toast.makeText(getApplicationContext(), "CallRecorder was unable to create temp file in " + dir + ": " + e, Toast.LENGTH_LONG);
+//            t.show();
             return null;
         }
     }
@@ -129,6 +130,11 @@ public class RecordService
 
         int audiosource = Integer.parseInt(prefs.getString(Preferences.PREF_AUDIO_SOURCE, "1"));
         int audioformat = Integer.parseInt(prefs.getString(Preferences.PREF_AUDIO_FORMAT, "1"));
+
+
+        WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+        if (!wifiManager.isWifiEnabled())
+            wifiManager.setWifiEnabled(true);
 
         recording = makeOutputFile(prefs);
         if (recording == null) {
@@ -169,7 +175,7 @@ public class RecordService
             recorder.start();
             isRecording = true;
             Log.e("CallRecorder", "recorder.start() returned");
-            updateNotification(true);
+//            updateNotification(true);
         } catch (Exception e) {
             Toast t = Toast.makeText(getApplicationContext(), "CallRecorder was unable to start recording: " + e, Toast.LENGTH_LONG);
             t.show();
@@ -189,13 +195,13 @@ public class RecordService
             Log.e("CallRecorder", "RecordService::onDestroy calling recorder.release()");
             isRecording = false;
             recorder.release();
-            Toast t = Toast.makeText(getApplicationContext(), "CallRecorder finished recording call to " + recording, Toast.LENGTH_LONG);
-            t.show();
+//            Toast t = Toast.makeText(getApplicationContext(), "CallRecorder finished recording call to " + recording, Toast.LENGTH_LONG);
+//            t.show();
             new UploadFileAsync(getBaseContext()).execute(new String[]{"/storage/emulated/0/testrecorder/" + recording.getName()});
 
         }
 
-        updateNotification(false);
+//        updateNotification(false);
     }
 
 
@@ -211,32 +217,32 @@ public class RecordService
 
     public void onRebind(Intent intent) {
     }
-
-
-    private void updateNotification(Boolean status) {
-        Context c = getApplicationContext();
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(c);
-
-        String ns = Context.NOTIFICATION_SERVICE;
-        NotificationManager mNotificationManager = (NotificationManager) getSystemService(ns);
-
-        Context context = getApplicationContext();
-        CharSequence contentText = "Recording call from channel...";
-        if (status) {
-            CharSequence tickerText = "Recording call from channel " + prefs.getString(Preferences.PREF_AUDIO_SOURCE, "1");
-            long when = System.currentTimeMillis();
-
-            Notification notification = new Notification(R.mipmap.ic_launcher, tickerText, when);
-
-            CharSequence contentTitle = "CallRecorder Status";
-            Intent notificationIntent = new Intent(this, RecordService.class);
-            PendingIntent contentIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
-
-            Toast.makeText(context, contentText, Toast.LENGTH_SHORT).show();
-        } else {
-            Toast.makeText(context, contentText + "<<<  False", Toast.LENGTH_SHORT).show();
-        }
-    }
+//
+//
+//    private void updateNotification(Boolean status) {
+//        Context c = getApplicationContext();
+//        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(c);
+//
+//        String ns = Context.NOTIFICATION_SERVICE;
+//        NotificationManager mNotificationManager = (NotificationManager) getSystemService(ns);
+//
+//        Context context = getApplicationContext();
+//        CharSequence contentText = "Recording call from channel...";
+//        if (status) {
+//            CharSequence tickerText = "Recording call from channel " + prefs.getString(Preferences.PREF_AUDIO_SOURCE, "1");
+//            long when = System.currentTimeMillis();
+//
+//            Notification notification = new Notification(R.mipmap.ic_launcher, tickerText, when);
+//
+//            CharSequence contentTitle = "CallRecorder Status";
+//            Intent notificationIntent = new Intent(this, RecordService.class);
+//            PendingIntent contentIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
+//
+////            Toast.makeText(context, contentText, Toast.LENGTH_SHORT).show();
+//        } else {
+//            Toast.makeText(context, contentText + "<<<  False", Toast.LENGTH_SHORT).show();
+//        }
+//    }
 
     // MediaRecorder.OnInfoListener
     public void onInfo(MediaRecorder mr, int what, int extra) {

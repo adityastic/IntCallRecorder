@@ -3,8 +3,10 @@ package com.adityagupta.intern2.activities;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
+import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
@@ -27,7 +29,6 @@ import com.afollestad.materialdialogs.Theme;
 
 public class MainRecordingActivity extends AppCompatActivity {
 
-    Switch callRecord;
     CardView whitelist, background, accessibility;
 
     @Override
@@ -36,20 +37,11 @@ public class MainRecordingActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main_recording);
         setStatusBarGradiant(this);
 
-        callRecord = findViewById(R.id.record_call);
         whitelist = findViewById(R.id.card_id_white);
         accessibility = findViewById(R.id.card_id_acc);
         background = findViewById(R.id.card_id_backg);
 
         Preferences.prefs = getApplicationContext().getSharedPreferences("call_info", MODE_PRIVATE);
-
-        callRecord.setChecked(Preferences.prefs.getBoolean("call_record", false));
-        callRecord.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                Preferences.prefs.edit().putBoolean("call_record", b).apply();
-            }
-        });
 
         whitelist.setOnClickListener(new View.OnClickListener() {
             @Override

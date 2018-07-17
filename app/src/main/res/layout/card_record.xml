@@ -59,17 +59,9 @@
                     android:layout_height="wrap_content"
                     android:layout_centerInParent="true"
                     android:lineSpacingExtra="8.0sp"
-                    android:layout_toLeftOf="@id/record_call"
                     android:text="Do you want to Record Calls ?"
                     android:textColor="?android:textColorPrimaryInverse"
                     android:textSize="14.0sp" />
-
-                <Switch
-                    android:id="@+id/record_call"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentRight="true"
-                    android:theme="@style/SwitchCallRecordCard"/>
 
             </RelativeLayout>
         </LinearLayout>

@@ -1,6 +1,7 @@
 package com.adityagupta.intern2.utils;
 
 import android.content.SharedPreferences;
+import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
 

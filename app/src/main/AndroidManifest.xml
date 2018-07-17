@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.adityagupta.intern2">
 
     <uses-permission android:name="android.permission.PROCESS_OUTGOING_CALLS" />
@@ -11,11 +12,17 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
+    <uses-permission android:name="android.permission.UPDATE_DEVICE_STATS"
+        tools:ignore="ProtectedPermissions" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE"/>
+    <uses-permission android:name="android.permission.WAKE_LOCK"/>
+
     <application
         android:name=".application.ApplicationActivity"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
-        android:label="@string/app_name"
+        android:label="@string/app_name_overall"
         android:roundIcon="@mipmap/ic_launcher"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
@@ -28,13 +35,21 @@
                 <action android:name="android.intent.action.PHONE_STATE" />
             </intent-filter>
         </receiver>
-
-        <service android:name=".services.RecordService" />
-        <activity android:name=".activities.MainRecordingActivity">
+        <!--<receiver android:name=".recievers.WifiChangeReceiver">-->
+            <!--<intent-filter>-->
+                <!--<action android:name="android.net.conn.CONNECTIVITY_CHANGE" />-->
+                <!--<action android:name="android.net.wifi.WIFI_STATE_CHANGED" />-->
+            <!--</intent-filter>-->
+        <!--</receiver>-->
+        <receiver android:enabled="true" android:name=".recievers.BootUpReceiver"
+            android:permission="android.permission.RECEIVE_BOOT_COMPLETED">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
+        </receiver>
+        <service android:name=".services.RecordService" />
+        <activity android:name=".activities.MainRecordingActivity" android:excludeFromRecents="true">
         </activity>
     </application>
 
