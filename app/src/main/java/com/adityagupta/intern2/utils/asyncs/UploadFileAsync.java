@@ -136,7 +136,18 @@ public class UploadFileAsync extends AsyncTask<String, Void, String> {
                     }
 
                     JSONObject jsonObject = new JSONObject(output.toString());
-                    writeableDatabse.delete("callrecordings", "id=?", new String[]{jsonObject.getString("id")});
+                    if(jsonObject.getString("code").equals("200"))
+                    {
+                        writeableDatabse.delete("callrecordings", "id=?", new String[]{jsonObject.getString("id")});
+
+                        if (sourceFile.exists()) {
+                            if (sourceFile.delete())
+                                Log.e("DELETEDFILE", "YES: " + params[0]);
+                            else
+                                Log.e("DELETEDFILE", "NO: " + params[0]);
+                        }
+                    }
+
 
                     // close the streams //
                     fileInputStream.close();

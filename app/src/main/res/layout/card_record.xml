@@ -62,7 +62,7 @@
                     android:gravity="center"
                     android:text="Do you want to Record Calls ?"
                     android:textColor="?android:textColorPrimaryInverse"
-                    android:textSize="14.0sp" />
+                    android:textSize="20.0sp" />
 
             </RelativeLayout>
         </LinearLayout>
