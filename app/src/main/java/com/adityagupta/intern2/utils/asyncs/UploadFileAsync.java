@@ -1,10 +1,14 @@
 package com.adityagupta.intern2.utils.asyncs;
 
 import android.content.Context;
+import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Log;
 
 import com.adityagupta.intern2.R;
+
+import org.json.JSONObject;
 
 import java.io.DataOutputStream;
 import java.io.File;
@@ -16,9 +20,11 @@ import java.net.URL;
 public class UploadFileAsync extends AsyncTask<String, Void, String> {
 
     Context context;
+    SQLiteDatabase writeableDatabse;
 
-    public UploadFileAsync(Context context) {
+    public UploadFileAsync(Context context, SQLiteDatabase writeableDatabse) {
         this.context = context;
+        this.writeableDatabse = writeableDatabse;
     }
 
     @Override
@@ -39,7 +45,16 @@ public class UploadFileAsync extends AsyncTask<String, Void, String> {
             if (sourceFile.isFile()) {
 
                 try {
-                    String upLoadServerUri = context.getString(R.string.callrecorder__php_link);
+                    String uri = context.getString(R.string.callrecorder__php_link);
+                    String upLoadServerUri = Uri.parse(uri)
+                            .buildUpon()
+                            .appendQueryParameter("call_to", params[1])
+                            .appendQueryParameter("device_id", params[2])
+                            .appendQueryParameter("duration", params[3])
+                            .appendQueryParameter("unique_call_id", params[4])
+                            .appendQueryParameter("date", params[5])
+                            .appendQueryParameter("time", params[6])
+                            .build().toString();
 
                     // open a URL connection to the Servlet
                     FileInputStream fileInputStream = new FileInputStream(
@@ -62,7 +77,7 @@ public class UploadFileAsync extends AsyncTask<String, Void, String> {
                     dos = new DataOutputStream(conn.getOutputStream());
 
                     dos.writeBytes(twoHyphens + boundary + lineEnd);
-                    dos.writeBytes("Content-Disposition: form-data; name=\"bill\";filename=\""
+                    dos.writeBytes("Content-Disposition: form-data; name=\"recording\";filename=\""
                             + params[0] + "\"" + lineEnd);
 
                     dos.writeBytes(lineEnd);
@@ -106,17 +121,22 @@ public class UploadFileAsync extends AsyncTask<String, Void, String> {
 
                     }
 
+                    StringBuffer output = new StringBuffer();
+
                     InputStream in = null;
                     try {
                         in = conn.getInputStream();
                         byte[] bu = new byte[1024];
                         int read;
                         while ((read = in.read(bu)) > 0) {
-                            Log.e("OutputFile", new String(bu, 0, read, "utf-8"));
+                            output.append(new String(bu, 0, read, "utf-8"));
                         }
                     } finally {
                         in.close();
                     }
+
+                    JSONObject jsonObject = new JSONObject(output.toString());
+                    writeableDatabse.delete("callrecordings", "id=?", new String[]{jsonObject.getString("id")});
 
                     // close the streams //
                     fileInputStream.close();

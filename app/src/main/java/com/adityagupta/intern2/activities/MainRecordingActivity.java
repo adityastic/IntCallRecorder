@@ -1,24 +1,30 @@
 package com.adityagupta.intern2.activities;
 
+import android.Manifest;
+import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
 import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.CardView;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.CompoundButton;
 import android.widget.Switch;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.adityagupta.intern2.R;
@@ -30,6 +36,7 @@ import com.afollestad.materialdialogs.Theme;
 public class MainRecordingActivity extends AppCompatActivity {
 
     CardView whitelist, background, accessibility;
+    TextView imei;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,8 +47,9 @@ public class MainRecordingActivity extends AppCompatActivity {
         whitelist = findViewById(R.id.card_id_white);
         accessibility = findViewById(R.id.card_id_acc);
         background = findViewById(R.id.card_id_backg);
+        imei = findViewById(R.id.device_imei);
 
-        Preferences.prefs = getApplicationContext().getSharedPreferences("call_info", MODE_PRIVATE);
+        imei.setText(Preferences.getIMEI(this));
 
         whitelist.setOnClickListener(new View.OnClickListener() {
             @Override

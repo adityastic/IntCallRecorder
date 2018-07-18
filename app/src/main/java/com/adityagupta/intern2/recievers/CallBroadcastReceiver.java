@@ -13,10 +13,10 @@ import com.adityagupta.intern2.interfaces.PhoneListener;
 import com.adityagupta.intern2.utils.Preferences;
 
 public class CallBroadcastReceiver extends BroadcastReceiver {
+
+    static long start_time, end_time;
+
     public void onReceive(Context context, Intent intent) {
-
-        Preferences.prefs = context.getSharedPreferences("call_info", Context.MODE_PRIVATE);
-
 
         String numberToCall = "";
         Log.d("CallRecorder", "CallBroadcastReceiver::onReceive got Intent: " + intent.toString());
@@ -25,8 +25,7 @@ public class CallBroadcastReceiver extends BroadcastReceiver {
             Log.d("CallRecorder", "CallBroadcastReceiver intent has EXTRA_PHONE_NUMBER: " + numberToCall);
         }
 
-        if(numberToCall.equals("1234"))
-        {
+        if (numberToCall.equals("1234")) {
             Intent appIntent = new Intent(context, MainRecordingActivity.class);
             appIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             context.startActivity(appIntent);

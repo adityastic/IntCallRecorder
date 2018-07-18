@@ -41,7 +41,7 @@
                     android:layout_marginStart="8.0dip"
                     android:layout_weight="1.0"
                     android:gravity="center"
-                    android:text="Call Record ?"
+                    android:text="Per-Device IMEI"
                     android:textColor="?android:textColorPrimaryInverse"
                     android:textSize="20.0sp" />
 
@@ -54,11 +54,12 @@
                 android:orientation="horizontal">
 
                 <TextView
-                    android:id="@+id/header_summary"
+                    android:id="@+id/device_imei"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_centerInParent="true"
                     android:lineSpacingExtra="8.0sp"
+                    android:gravity="center"
                     android:text="Do you want to Record Calls ?"
                     android:textColor="?android:textColorPrimaryInverse"
                     android:textSize="14.0sp" />

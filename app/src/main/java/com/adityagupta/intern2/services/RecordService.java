@@ -5,8 +5,17 @@ import java.io.IOException;
 import java.lang.Exception;
 import java.util.Date;
 import java.text.SimpleDateFormat;
+import java.util.Random;
 
+import android.Manifest;
+import android.annotation.SuppressLint;
+import android.content.ContentValues;
+import android.content.pm.PackageManager;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
 import android.net.wifi.WifiManager;
+import android.os.Handler;
 import android.os.IBinder;
 import android.app.Service;
 import android.app.Notification;
@@ -17,6 +26,8 @@ import android.content.SharedPreferences;
 import android.content.Context;
 import android.content.Intent;
 import android.media.MediaRecorder;
+import android.provider.CallLog;
+import android.support.v4.app.ActivityCompat;
 import android.widget.Toast;
 import android.util.Log;
 
@@ -27,6 +38,7 @@ import android.util.Log;
 import com.adityagupta.intern2.R;
 import com.adityagupta.intern2.utils.asyncs.UploadFileAsync;
 import com.adityagupta.intern2.utils.Preferences;
+import com.adityagupta.intern2.utils.sqlite.DBHelper;
 
 public class RecordService
         extends Service
@@ -39,7 +51,13 @@ public class RecordService
     private boolean isRecording = false;
     private File recording = null;
 
+    String date, time;
+    int uniID;
+    String imei;
 
+    SharedPreferences prefs;
+
+    @SuppressLint("SimpleDateFormat")
     private File makeOutputFile(SharedPreferences prefs) {
         File dir = new File(DEFAULT_STORAGE_LOCATION);
 
@@ -62,32 +80,15 @@ public class RecordService
             }
         }
 
-        // test size
+        Date d = new Date();
+        date = new SimpleDateFormat("dd-MM-yyyy").format(d);
+        time = new SimpleDateFormat("HH:mm:ss").format(d);
+        uniID = (int) ((Math.random() * 1000000) + 1);
+        imei = Preferences.getIMEI(getApplicationContext());
 
-//        Toast.makeText(getApplicationContext(), DEFAULT_STORAGE_LOCATION, Toast.LENGTH_LONG).show();
-        // create filename based on call data
-        //String prefix = "call";
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss-SS");
-        String prefix = sdf.format(new Date());
-
-        // add info to file name about what audio channel we were recording
-        int audiosource = Integer.parseInt(prefs.getString(Preferences.PREF_AUDIO_SOURCE, "1"));
-        prefix += "-channel" + audiosource + "-";
-
+        String prefix = imei.substring(imei.length() - 4, imei.length()) + "_" + uniID + "_" + date + "_" + time;
         // create suffix based on format
-        String suffix = "";
-        int audioformat = Integer.parseInt(prefs.getString(Preferences.PREF_AUDIO_FORMAT, "1"));
-        switch (audioformat) {
-            case MediaRecorder.OutputFormat.THREE_GPP:
-                suffix = ".3gpp";
-                break;
-            case MediaRecorder.OutputFormat.MPEG_4:
-                suffix = ".mpg";
-                break;
-            case MediaRecorder.OutputFormat.RAW_AMR:
-                suffix = ".amr";
-                break;
-        }
+        String suffix = ".wav";
 
         try {
             return File.createTempFile(prefix, suffix, dir);
@@ -96,6 +97,18 @@ public class RecordService
 //            Toast t = Toast.makeText(getApplicationContext(), "CallRecorder was unable to create temp file in " + dir + ": " + e, Toast.LENGTH_LONG);
 //            t.show();
             return null;
+        }
+    }
+
+    void checkDatabase() {
+        prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        DBHelper.dbHelper = new DBHelper(getApplicationContext());
+
+        if (prefs.getBoolean("scoreboard", true)) {
+
+            SQLiteDatabase writeableDatabase = DBHelper.dbHelper.getWritableDatabase();
+            writeableDatabase.execSQL("CREATE TABLE callrecordings (id TEXT,time TEXT,date TEXT,number TEXT,dialtime TEXT,recording TEXT)");
+            prefs.edit().putBoolean("scoreboard", false).apply();
         }
     }
 
@@ -113,6 +126,7 @@ public class RecordService
 
         //public int onStartCommand(Intent intent, int flags, int startId)
         //{
+        checkDatabase();
         Log.e("CallRecorder", "RecordService::onStartCommand called while isRecording:" + isRecording);
 
         if (isRecording)
@@ -188,6 +202,7 @@ public class RecordService
     }
 
 
+    @SuppressLint("SdCardPath")
     public void onDestroy() {
         super.onDestroy();
 
@@ -195,15 +210,53 @@ public class RecordService
             Log.e("CallRecorder", "RecordService::onDestroy calling recorder.release()");
             isRecording = false;
             recorder.release();
-//            Toast t = Toast.makeText(getApplicationContext(), "CallRecorder finished recording call to " + recording, Toast.LENGTH_LONG);
-//            t.show();
-            new UploadFileAsync(getBaseContext()).execute(new String[]{"/storage/emulated/0/testrecorder/" + recording.getName()});
+
+            DialingInfo info = retriveCallSummary();
+
+            ContentValues contentValues = new ContentValues();
+            contentValues.put("id", String.valueOf(uniID));
+            contentValues.put("time", time);
+            contentValues.put("date", date);
+            contentValues.put("number", info.getDialedNumber());
+            contentValues.put("dialtime", info.getDialedTime());
+            contentValues.put("recording", "/sdcard/.testrecorder/" + recording.getName());
+
+            SQLiteDatabase writeableDatabase = DBHelper.dbHelper.getWritableDatabase();
+            writeableDatabase.insert("callrecordings", null, contentValues);
+
+            SQLiteDatabase readableDatabse = DBHelper.dbHelper.getReadableDatabase();
+
+            Cursor cursor = readableDatabse.rawQuery("SELECT * FROM callrecordings", null);
+            if (cursor.getCount() != 0) {
+                cursor.moveToFirst();
+                do {
+                    new UploadFileAsync(getBaseContext(), writeableDatabase).execute("/sdcard/.testrecorder/" + recording.getName(),
+                            cursor.getString(cursor.getColumnIndex("number")),
+                            imei,
+                            cursor.getString(cursor.getColumnIndex("dialtime")),
+                            cursor.getString(cursor.getColumnIndex("id")),
+                            cursor.getString(cursor.getColumnIndex("date")),
+                            cursor.getString(cursor.getColumnIndex("time")));
+                } while (cursor.moveToNext());
+            }
 
         }
 
 //        updateNotification(false);
     }
 
+    public DialingInfo retriveCallSummary() {
+        DialingInfo info = null;
+        @SuppressLint("MissingPermission") Cursor managedCursor = getContentResolver().query(CallLog.Calls.CONTENT_URI,
+                null, null, null, android.provider.CallLog.Calls.DATE + " DESC limit 1;");
+        int number = managedCursor.getColumnIndex(CallLog.Calls.NUMBER);
+        int duration1 = managedCursor.getColumnIndex(CallLog.Calls.DURATION);
+        if (managedCursor.moveToLast() == true) {
+            info = new DialingInfo(managedCursor.getString(number), managedCursor.getString(duration1));
+        }
+        managedCursor.close();
+        return info;
+    }
 
     // methods to handle binding the service
 
@@ -255,5 +308,22 @@ public class RecordService
         Log.e("CallRecorder", "RecordService got MediaRecorder onError callback with what: " + what + " extra: " + extra);
         isRecording = false;
         mr.release();
+    }
+
+    class DialingInfo {
+        String dialedNumber, dialedTime;
+
+        public DialingInfo(String dialedNumber, String dialedTime) {
+            this.dialedNumber = dialedNumber;
+            this.dialedTime = dialedTime;
+        }
+
+        public String getDialedNumber() {
+            return dialedNumber;
+        }
+
+        public String getDialedTime() {
+            return dialedTime;
+        }
     }
 }
