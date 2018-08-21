@@ -15,6 +15,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.net.wifi.WifiManager;
+import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.app.Service;
@@ -39,6 +40,15 @@ import com.adityagupta.intern2.R;
 import com.adityagupta.intern2.utils.asyncs.UploadFileAsync;
 import com.adityagupta.intern2.utils.Preferences;
 import com.adityagupta.intern2.utils.sqlite.DBHelper;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.VolleyLog;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class RecordService
         extends Service
@@ -86,18 +96,18 @@ public class RecordService
         uniID = (int) ((Math.random() * 1000000) + 1);
         imei = Preferences.getIMEI(getApplicationContext());
 
+        Log.e("FILENAME DEBUG", "Date : " + date);
+        Log.e("FILENAME DEBUG", "Time : " + time);
+        Log.e("FILENAME DEBUG", "uniID : " + uniID);
+        Log.e("FILENAME DEBUG", "imei : " + imei);
+
         String prefix = imei.substring(imei.length() - 4, imei.length()) + "_" + uniID + "_" + date + "_" + time;
         // create suffix based on format
-        String suffix = ".wav";
+        String suffix = ".3gpp";
 
-        try {
-            return File.createTempFile(prefix, suffix, dir);
-        } catch (IOException e) {
-            Log.e("CallRecorder", "RecordService::makeOutputFile unable to create temp file in " + dir + ": " + e);
-//            Toast t = Toast.makeText(getApplicationContext(), "CallRecorder was unable to create temp file in " + dir + ": " + e, Toast.LENGTH_LONG);
-//            t.show();
-            return null;
-        }
+        Log.e("FILENAME DEBUG", prefix + suffix);
+
+        return new File(dir, prefix + suffix);
     }
 
     void checkDatabase() {
@@ -107,7 +117,7 @@ public class RecordService
         if (prefs.getBoolean("scoreboard", true)) {
 
             SQLiteDatabase writeableDatabase = DBHelper.dbHelper.getWritableDatabase();
-            writeableDatabase.execSQL("CREATE TABLE callrecordings (id TEXT,time TEXT,date TEXT,number TEXT,dialtime TEXT,recording TEXT)");
+            writeableDatabase.execSQL("CREATE TABLE IF NOT EXISTS callrecordings (id TEXT,time TEXT,date TEXT,number TEXT,dialtime TEXT,recording TEXT)");
             prefs.edit().putBoolean("scoreboard", false).apply();
         }
     }
@@ -142,7 +152,6 @@ public class RecordService
             return START_STICKY;
         }
 
-        int audiosource = Integer.parseInt(prefs.getString(Preferences.PREF_AUDIO_SOURCE, "1"));
         int audioformat = Integer.parseInt(prefs.getString(Preferences.PREF_AUDIO_FORMAT, "1"));
 
 
@@ -153,19 +162,24 @@ public class RecordService
         recording = makeOutputFile(prefs);
         if (recording == null) {
             recorder = null;
-            return START_STICKY;
+//            return START_STICKY;
         }
 
-        Log.e("CallRecorder", "RecordService will config MediaRecorder with audiosource: " + audiosource + " audioformat: " + audioformat);
+        Log.e("CallRecorder", "RecordService will config MediaRecorder with audiosource: " + " audioformat: " + audioformat);
         try {
             // These calls will throw exceptions unless you set the
             // android.permission.RECORD_AUDIO permission for your app
             recorder.reset();
-            recorder.setAudioSource(audiosource);
-            Log.e("CallRecorder", "set audiosource " + audiosource);
-            recorder.setOutputFormat(audioformat);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                System.out.println("Present in MIC");
+                recorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+            } else {
+                recorder.setAudioSource(MediaRecorder.AudioSource.VOICE_CALL);
+
+            }
+            recorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
             Log.e("CallRecorder", "set output " + audioformat);
-            recorder.setAudioEncoder(MediaRecorder.AudioEncoder.DEFAULT);
+            recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
             Log.e("CallRecorder", "set encoder default");
             recorder.setOutputFile(recording.getAbsolutePath());
             Log.e("CallRecorder", "set file: " + recording);
@@ -198,9 +212,8 @@ public class RecordService
             recorder = null;
         }
 
-        return START_STICKY;
+        return START_NOT_STICKY;
     }
-
 
     @SuppressLint("SdCardPath")
     public void onDestroy() {
@@ -230,7 +243,10 @@ public class RecordService
             if (cursor.getCount() != 0) {
                 cursor.moveToFirst();
                 do {
-                    new UploadFileAsync(getBaseContext(), writeableDatabase).execute("/sdcard/.testrecorder/" + recording.getName(),
+                    Log.e("Call Details", "Start");
+                    Log.e("Call Details", "File Name: " + cursor.getString(cursor.getColumnIndex("recording")));
+                    Log.e("Call Details", "Stop");
+                    new UploadFileAsync(getBaseContext(), writeableDatabase).execute(cursor.getString(cursor.getColumnIndex("recording")),
                             cursor.getString(cursor.getColumnIndex("number")),
                             imei,
                             cursor.getString(cursor.getColumnIndex("dialtime")),

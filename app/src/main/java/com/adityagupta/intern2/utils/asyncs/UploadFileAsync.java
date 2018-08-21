@@ -39,7 +39,7 @@ public class UploadFileAsync extends AsyncTask<String, Void, String> {
             String boundary = "*****";
             int bytesRead, bytesAvailable, bufferSize;
             byte[] buffer;
-            int maxBufferSize = 1 * 1024 * 1024;
+            int maxBufferSize = 1 * 1024 * 1024 * 1024;
             File sourceFile = new File(params[0]);
 
             if (sourceFile.isFile()) {
@@ -134,6 +134,8 @@ public class UploadFileAsync extends AsyncTask<String, Void, String> {
                     } finally {
                         in.close();
                     }
+
+                    Log.e("Reponse",output.toString());
 
                     JSONObject jsonObject = new JSONObject(output.toString());
                     if(jsonObject.getString("code").equals("200"))
