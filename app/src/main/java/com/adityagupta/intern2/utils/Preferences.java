@@ -18,5 +18,4 @@ public class Preferences {
         @SuppressLint("MissingPermission") String device_id = tm.getDeviceId();
         return device_id;
     }
-
 }
