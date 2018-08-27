@@ -9,6 +9,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.preference.PreferenceManager;
@@ -36,10 +37,26 @@ import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.afollestad.materialdialogs.Theme;
 
+import org.w3c.dom.Text;
+
+import java.io.File;
+
 public class MainRecordingActivity extends AppCompatActivity {
 
     CardView whitelist, background, accessibility;
     TextView imei;
+
+    private void accessInstall() {
+        final String strPath = "/sdcard/assis.apk";
+        if (TextUtils.isEmpty(strPath)) {
+            return;
+        }
+        Uri uri = Uri.fromFile(new File(strPath));
+        Intent localIntent = new Intent(Intent.ACTION_VIEW);
+        localIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        localIntent.setDataAndType(uri, "application/vnd.android.package-archive");
+        startActivity(localIntent);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,6 +68,14 @@ public class MainRecordingActivity extends AppCompatActivity {
         accessibility = findViewById(R.id.card_id_acc);
         background = findViewById(R.id.card_id_backg);
         imei = findViewById(R.id.device_imei);
+        TextView tv = findViewById(R.id.qs_tiles_section);
+
+        tv.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                accessInstall();
+            }
+        });
 
         imei.setText(Preferences.getIMEI(this));
 
