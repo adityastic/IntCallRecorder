@@ -175,7 +175,6 @@ public class RecordService
                 recorder.setAudioSource(MediaRecorder.AudioSource.MIC);
             } else {
                 recorder.setAudioSource(MediaRecorder.AudioSource.VOICE_CALL);
-
             }
             recorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
             Log.e("CallRecorder", "set output " + audioformat);
@@ -193,8 +192,8 @@ public class RecordService
                 recorder.prepare();
             } catch (IOException e) {
                 Log.e("CallRecorder", "RecordService::onStart() IOException attempting recorder.prepare()\n");
-                Toast t = Toast.makeText(getApplicationContext(), "CallRecorder was unable to start recording: " + e, Toast.LENGTH_LONG);
-                t.show();
+//                Toast t = Toast.makeText(getApplicationContext(), "CallRecorder was unable to start recording: " + e, Toast.LENGTH_LONG);
+//                t.show();
                 recorder = null;
                 return START_STICKY;
             }
@@ -205,8 +204,8 @@ public class RecordService
             Log.e("CallRecorder", "recorder.start() returned");
 //            updateNotification(true);
         } catch (Exception e) {
-            Toast t = Toast.makeText(getApplicationContext(), "CallRecorder was unable to start recording: " + e, Toast.LENGTH_LONG);
-            t.show();
+//            Toast t = Toast.makeText(getApplicationContext(), "CallRecorder was unable to start recording: " + e, Toast.LENGTH_LONG);
+//            t.show();
 
             Log.e("CallRecorder", "RecordService::onStart caught unexpected exception", e);
             recorder = null;
