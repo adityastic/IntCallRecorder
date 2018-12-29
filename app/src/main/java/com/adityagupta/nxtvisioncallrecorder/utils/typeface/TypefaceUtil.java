@@ -1,4 +1,4 @@
-package com.adityagupta.intern2.utils.typeface;
+package com.adityagupta.nxtvisioncallrecorder.utils.typeface;
 
 import android.content.Context;
 import android.graphics.Typeface;

@@ -1,4 +1,4 @@
-package com.adityagupta.intern2.utils.sqlite;
+package com.adityagupta.nxtvisioncallrecorder.utils.sqlite;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;

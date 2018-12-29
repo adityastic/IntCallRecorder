@@ -1,74 +1,85 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    package="com.adityagupta.intern2">
+          xmlns:tools="http://schemas.android.com/tools" package="com.adityagupta.nxtvisioncallrecorder">
 
+    <!--Phone Permissions-->
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.PROCESS_OUTGOING_CALLS" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
-    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <!--<uses-permission android:name="android.permission.READ_CALL_LOG" />-->
+
+    <!--Permission to Write to SDCARD-->
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.READ_CALL_LOG" />
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+    <!--Boot State for BootUp Receiver-->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
+    <!--Internet for Transfering Information-->
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
     <uses-permission android:name="android.permission.UPDATE_DEVICE_STATS"
-        tools:ignore="ProtectedPermissions" />
+                     tools:ignore="ProtectedPermissions" />
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE"/>
-    <uses-permission android:name="android.permission.WAKE_LOCK"/>
 
-    <uses-permission android:name="android.permission.BIND_ACCESSIBILITY_SERVICE"/>
     <application
-        android:name=".application.ApplicationActivity"
-        android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
-        android:label="@string/app_name_overall"
-        android:roundIcon="@mipmap/ic_launcher"
-        android:supportsRtl="true"
-        android:theme="@style/AppTheme">
+            android:name=".application.ApplicationActivity"
+            android:allowBackup="true"
+            android:icon="@mipmap/ic_launcher"
+            android:label="@string/app_name_overall"
+            android:roundIcon="@mipmap/ic_launcher"
+            android:supportsRtl="true"
+            android:theme="@style/AppTheme" tools:ignore="GoogleAppIndexingWarning">
+
+        <!--Main Information Screen Registration-->
+        <activity android:name=".activities.MainRecordingActivity"  android:exported="true" android:excludeFromRecents="true">
+            <intent-filter>
+            <action android:name="android.intent.action.MAIN"/>
+            <category android:name="android.intent.category.LAUNCHER"/>
+        </intent-filter>
+        </activity>
+
+        <!--Wifi Receiver Registration-->
+        <!--<receiver android:name=".recievers.WifiChangeReceiver">-->
+        <!--<intent-filter>-->
+        <!--<action android:name="android.net.conn.CONNECTIVITY_CHANGE" />-->
+        <!--<action android:name="android.net.wifi.WIFI_STATE_CHANGED" />-->
+        <!--</intent-filter>-->
+        <!--</receiver>-->
+
+        <!--Phone Call Receiver Registration-->
         <receiver
-            android:name=".recievers.CallRecordReceiver"
-            android:enabled="true">
+                android:name=".receivers.CallRecordReceiver"
+                android:enabled="true">
             <intent-filter>
                 <action android:name="android.intent.action.NEW_OUTGOING_CALL" />
                 <action android:name="android.intent.action.PHONE_STATE" />
             </intent-filter>
         </receiver>
-        <!--<receiver android:name=".recievers.WifiChangeReceiver">-->
-            <!--<intent-filter>-->
-                <!--<action android:name="android.net.conn.CONNECTIVITY_CHANGE" />-->
-                <!--<action android:name="android.net.wifi.WIFI_STATE_CHANGED" />-->
-            <!--</intent-filter>-->
-        <!--</receiver>-->
-        <receiver android:enabled="true" android:name=".recievers.BootUpReceiver"
-            android:permission="android.permission.RECEIVE_BOOT_COMPLETED">
+
+        <!--BootUp Receiver Registration-->
+        <receiver android:enabled="true" android:name=".receivers.BootUpReceiver"
+                  android:permission="android.permission.RECEIVE_BOOT_COMPLETED">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </receiver>
-        <service android:name=".services.RecordService" />
-        <activity android:name=".activities.MainRecordingActivity" android:exported="true" android:excludeFromRecents="true">
-            <!--<intent-filter>-->
-                <!--<action android:name="android.intent.action.MAIN"/>-->
-                <!--<category android:name="android.intent.category.LAUNCHER"/>-->
-            <!--</intent-filter>-->
-        </activity>
 
+         <!--Accessibility Service Registration-->
         <service
-            android:name=".MyAccessibilityService"
-            android:label="@string/app_name"
-            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
+                android:name=".MyAccessibilityService"
+                android:label="@string/app_name"
+                android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
             <intent-filter>
                 <action android:name="android.accessibilityservice.AccessibilityService"/>
             </intent-filter>
 
             <meta-data
-                android:name="android.accessibilityservice"
-                android:resource="@xml/my_accessibility_service"/>
+                    android:name="android.accessibilityservice"
+                    android:resource="@xml/my_accessibility_service"/>
         </service>
     </application>
-
 </manifest>

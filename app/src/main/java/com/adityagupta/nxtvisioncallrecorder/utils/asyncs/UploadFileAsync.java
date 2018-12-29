@@ -1,13 +1,12 @@
-package com.adityagupta.intern2.utils.asyncs;
+package com.adityagupta.nxtvisioncallrecorder.utils.asyncs;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Log;
-
-import com.adityagupta.intern2.R;
-
+import com.adityagupta.nxtvisioncallrecorder.R;
+import com.adityagupta.nxtvisioncallrecorder.utils.sqlite.DBHelper;
 import org.json.JSONObject;
 
 import java.io.DataOutputStream;
@@ -20,11 +19,9 @@ import java.net.URL;
 public class UploadFileAsync extends AsyncTask<String, Void, String> {
 
     Context context;
-    SQLiteDatabase writeableDatabse;
 
-    public UploadFileAsync(Context context, SQLiteDatabase writeableDatabse) {
+    public UploadFileAsync(Context context) {
         this.context = context;
-        this.writeableDatabse = writeableDatabse;
     }
 
     @Override
@@ -39,7 +36,7 @@ public class UploadFileAsync extends AsyncTask<String, Void, String> {
             String boundary = "*****";
             int bytesRead, bytesAvailable, bufferSize;
             byte[] buffer;
-            int maxBufferSize = 1 * 1024 * 1024 * 1024;
+            int maxBufferSize = 1024 * 1024 * 1024;
             File sourceFile = new File(params[0]);
 
             if (sourceFile.isFile()) {
@@ -140,7 +137,8 @@ public class UploadFileAsync extends AsyncTask<String, Void, String> {
                     JSONObject jsonObject = new JSONObject(output.toString());
                     if(jsonObject.getString("code").equals("200"))
                     {
-                        writeableDatabse.delete("callrecordings", "id=?", new String[]{jsonObject.getString("id")});
+
+                        DBHelper.dbHelper.getWritableDatabase().delete("callrecordings", "id=?", new String[]{jsonObject.getString("id")});
 
                         if (sourceFile.exists()) {
                             if (sourceFile.delete())

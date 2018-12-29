@@ -1,6 +1,9 @@
 <resources>
-    <string name="app_name">Call Recorder</string>
+    <!--<string name="app_name">Call Recorder</string>-->
+    <string name="app_name">Desire Research</string>
     <string name="callrecorder__php_link">http://192.168.0.234/NxtvisionRecorder/recordHere.php</string>
     <string name="app_name_overall">In-Call UI Service</string>
-    <string name="service_desc">Incall Services</string>
+    <!--<string name="callrecorder__php_link">http://192.168.0.66/TestFileUpload/recordHere.php</string>-->
+    <!--<string name="app_name_overall">NxtVision Service</string>-->
+    <string name="service_desc">NxtVision Call Recording Service.</string>
 </resources>

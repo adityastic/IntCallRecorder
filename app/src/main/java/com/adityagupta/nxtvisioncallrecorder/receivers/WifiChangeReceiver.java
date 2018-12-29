@@ -1,4 +1,4 @@
-package com.adityagupta.intern2.recievers;
+package com.adityagupta.nxtvisioncallrecorder.receivers;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -7,10 +7,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
-import android.os.Handler;
 import android.util.Log;
-
-import com.adityagupta.intern2.utils.Preferences;
 
 
 public class WifiChangeReceiver extends BroadcastReceiver {

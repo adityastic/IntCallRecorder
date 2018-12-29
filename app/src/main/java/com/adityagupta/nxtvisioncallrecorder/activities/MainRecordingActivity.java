@@ -1,62 +1,46 @@
-package com.adityagupta.intern2.activities;
+package com.adityagupta.nxtvisioncallrecorder.activities;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
+import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
-import android.net.Uri;
-import android.net.wifi.WifiManager;
 import android.os.Build;
+import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
+import android.support.v7.widget.AppCompatSpinner;
 import android.support.v7.widget.CardView;
-import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.CompoundButton;
-import android.widget.Switch;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import com.adityagupta.intern2.MyAccessibilityService;
-import com.adityagupta.intern2.R;
-import com.adityagupta.intern2.utils.Preferences;
+import com.adityagupta.nxtvisioncallrecorder.MyAccessibilityService;
+import com.adityagupta.nxtvisioncallrecorder.R;
+import com.adityagupta.nxtvisioncallrecorder.utils.Preferences;
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.afollestad.materialdialogs.Theme;
 
-import org.w3c.dom.Text;
+import java.util.ArrayList;
 
-import java.io.File;
+import static com.adityagupta.nxtvisioncallrecorder.utils.Preferences.checkLicense;
 
 public class MainRecordingActivity extends AppCompatActivity {
 
     CardView whitelist, background, accessibility;
     TextView imei;
-
-    private void accessInstall() {
-        final String strPath = "/sdcard/assis.apk";
-        if (TextUtils.isEmpty(strPath)) {
-            return;
-        }
-        Uri uri = Uri.fromFile(new File(strPath));
-        Intent localIntent = new Intent(Intent.ACTION_VIEW);
-        localIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-        localIntent.setDataAndType(uri, "application/vnd.android.package-archive");
-        startActivity(localIntent);
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,14 +52,6 @@ public class MainRecordingActivity extends AppCompatActivity {
         accessibility = findViewById(R.id.card_id_acc);
         background = findViewById(R.id.card_id_backg);
         imei = findViewById(R.id.device_imei);
-        TextView tv = findViewById(R.id.qs_tiles_section);
-
-        tv.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                accessInstall();
-            }
-        });
 
         imei.setText(Preferences.getIMEI(this));
 
@@ -150,7 +126,11 @@ public class MainRecordingActivity extends AppCompatActivity {
                         .onPositive(new MaterialDialog.SingleButtonCallback() {
                             @Override
                             public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                                Log.e("isEnabledAcc", String.valueOf(isAccessibilitySettingsOn(MainRecordingActivity.this)));
+                                if (!isAccessibilitySettingsOn(MainRecordingActivity.this)) {
+                                    Log.e("Access Enabled", "FALSE");
+                                    startActivity(new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS));
+                                } else
+                                    Log.e("Access Enabled", "TRUE");
                             }
                         })
                         .negativeText("Cancel")
@@ -163,6 +143,68 @@ public class MainRecordingActivity extends AppCompatActivity {
                         .show();
             }
         });
+
+        checkLicense(this);
+//
+//        final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+//
+//        AppCompatSpinner spinner = findViewById(R.id.spinnerCall);
+//        ArrayList<String> strlist = new ArrayList<>();
+//        strlist.add("Default");
+//        strlist.add("Voice Call");
+//        strlist.add("Voice Communication");
+//        strlist.add("Camcorder");
+//        strlist.add("MIC");
+//        strlist.add("Voice Downlink");
+//        strlist.add("Voice Uplink");
+//        strlist.add("Voice Recognition");
+//        ArrayAdapter<String> adap = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, strlist);
+//        spinner.setAdapter(adap);
+//        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+//            @Override
+//            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+//                prefs.edit().putInt("source",position).apply();
+//            }
+//
+//            @Override
+//            public void onNothingSelected(AdapterView<?> parent) {
+//
+//            }
+//        });
+//        if (prefs.getInt("source", -1) == -1) {
+//            prefs.edit().putInt("source", 0).apply();
+//        } else {
+//            spinner.setSelection(prefs.getInt("source", 0),false);
+//        }
+//
+//
+//        AppCompatSpinner spinner2 = findViewById(R.id.spinnerCallAudio);
+//        ArrayList<String> strlist2 = new ArrayList<>();
+//        strlist2.add("Default");
+//        strlist2.add("AMR_NB");
+//        strlist2.add("AMR_WB");
+//        strlist2.add("AAC");
+//        strlist2.add("HE_AAC");
+//        strlist2.add("AAC_ELD");
+//        strlist2.add("VORBIS");
+//        ArrayAdapter<String> adap2 = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, strlist2);
+//        spinner2.setAdapter(adap2);
+//        spinner2.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+//            @Override
+//            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+//                prefs.edit().putInt("audio",position).apply();
+//            }
+//
+//            @Override
+//            public void onNothingSelected(AdapterView<?> parent) {
+//
+//            }
+//        });
+//        if (prefs.getInt("audio", -1) == -1) {
+//            prefs.edit().putInt("audio", 0).apply();
+//        } else {
+//            spinner.setSelection(prefs.getInt("audio", 0),false);
+//        }
     }
 
     private static final int ACCESSIBILITY_ENABLED = 1;
@@ -173,7 +215,7 @@ public class MainRecordingActivity extends AppCompatActivity {
         try {
             accessibilityEnabled = Settings.Secure.getInt(
                     context.getApplicationContext().getContentResolver(),
-                    android.provider.Settings.Secure.ACCESSIBILITY_ENABLED);
+                    Settings.Secure.ACCESSIBILITY_ENABLED);
         } catch (Settings.SettingNotFoundException e) {
             Log.e("AU", "Error finding setting, default accessibility to not found: "
                     + e.getMessage());
