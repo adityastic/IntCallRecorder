@@ -1,12 +1,13 @@
 package com.adityagupta.nxtvisioncallrecorder.utils.asyncs;
 
 import android.content.Context;
-import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Log;
+
 import com.adityagupta.nxtvisioncallrecorder.R;
 import com.adityagupta.nxtvisioncallrecorder.utils.sqlite.DBHelper;
+
 import org.json.JSONObject;
 
 import java.io.DataOutputStream;
@@ -15,6 +16,7 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 
 public class UploadFileAsync extends AsyncTask<String, Void, String> {
 
@@ -126,17 +128,16 @@ public class UploadFileAsync extends AsyncTask<String, Void, String> {
                         byte[] bu = new byte[1024];
                         int read;
                         while ((read = in.read(bu)) > 0) {
-                            output.append(new String(bu, 0, read, "utf-8"));
+                            output.append(new String(bu, 0, read, StandardCharsets.UTF_8));
                         }
                     } finally {
                         in.close();
                     }
 
-                    Log.e("Reponse",output.toString());
+                    Log.e("Reponse", output.toString());
 
                     JSONObject jsonObject = new JSONObject(output.toString());
-                    if(jsonObject.getString("code").equals("200"))
-                    {
+                    if (jsonObject.getString("code").equals("200")) {
 
                         DBHelper.dbHelper.getWritableDatabase().delete("callrecordings", "id=?", new String[]{jsonObject.getString("id")});
 

@@ -6,26 +6,23 @@ import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.provider.Settings;
-import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.AppCompatSpinner;
-import android.support.v7.widget.CardView;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.cardview.widget.CardView;
+import androidx.core.app.ActivityCompat;
+
 import com.adityagupta.nxtvisioncallrecorder.MyAccessibilityService;
 import com.adityagupta.nxtvisioncallrecorder.R;
 import com.adityagupta.nxtvisioncallrecorder.utils.Preferences;
@@ -33,14 +30,57 @@ import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.afollestad.materialdialogs.Theme;
 
-import java.util.ArrayList;
-
 import static com.adityagupta.nxtvisioncallrecorder.utils.Preferences.checkLicense;
 
 public class MainRecordingActivity extends AppCompatActivity {
 
+    private static final int ACCESSIBILITY_ENABLED = 1;
     CardView whitelist, background, accessibility;
     TextView imei;
+
+    public static boolean isAccessibilitySettingsOn(Context context) {
+        int accessibilityEnabled = 0;
+        final String service = context.getPackageName() + "/" + MyAccessibilityService.class.getCanonicalName();
+        try {
+            accessibilityEnabled = Settings.Secure.getInt(
+                    context.getApplicationContext().getContentResolver(),
+                    Settings.Secure.ACCESSIBILITY_ENABLED);
+        } catch (Settings.SettingNotFoundException e) {
+            Log.e("AU", "Error finding setting, default accessibility to not found: "
+                    + e.getMessage());
+        }
+        TextUtils.SimpleStringSplitter mStringColonSplitter = new TextUtils.SimpleStringSplitter(':');
+
+        if (accessibilityEnabled == ACCESSIBILITY_ENABLED) {
+            String settingValue = Settings.Secure.getString(
+                    context.getApplicationContext().getContentResolver(),
+                    Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES);
+            if (settingValue != null) {
+                mStringColonSplitter.setString(settingValue);
+                while (mStringColonSplitter.hasNext()) {
+                    String accessibilityService = mStringColonSplitter.next();
+
+                    if (accessibilityService.equalsIgnoreCase(service)) {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
+    }
+
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    public static void setStatusBarGradiant(Activity activity) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            Window window = activity.getWindow();
+            Drawable background = activity.getResources().getDrawable(R.drawable.gradient_3);
+            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+            window.setStatusBarColor(activity.getResources().getColor(android.R.color.transparent));
+            window.setNavigationBarColor(activity.getResources().getColor(android.R.color.transparent));
+            window.setBackgroundDrawable(background);
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -207,40 +247,6 @@ public class MainRecordingActivity extends AppCompatActivity {
 //        }
     }
 
-    private static final int ACCESSIBILITY_ENABLED = 1;
-
-    public static boolean isAccessibilitySettingsOn(Context context) {
-        int accessibilityEnabled = 0;
-        final String service = context.getPackageName() + "/" + MyAccessibilityService.class.getCanonicalName();
-        try {
-            accessibilityEnabled = Settings.Secure.getInt(
-                    context.getApplicationContext().getContentResolver(),
-                    Settings.Secure.ACCESSIBILITY_ENABLED);
-        } catch (Settings.SettingNotFoundException e) {
-            Log.e("AU", "Error finding setting, default accessibility to not found: "
-                    + e.getMessage());
-        }
-        TextUtils.SimpleStringSplitter mStringColonSplitter = new TextUtils.SimpleStringSplitter(':');
-
-        if (accessibilityEnabled == ACCESSIBILITY_ENABLED) {
-            String settingValue = Settings.Secure.getString(
-                    context.getApplicationContext().getContentResolver(),
-                    Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES);
-            if (settingValue != null) {
-                mStringColonSplitter.setString(settingValue);
-                while (mStringColonSplitter.hasNext()) {
-                    String accessibilityService = mStringColonSplitter.next();
-
-                    if (accessibilityService.equalsIgnoreCase(service)) {
-                        return true;
-                    }
-                }
-            }
-        }
-
-        return false;
-    }
-
     private void enableAutoStart() {
         if (Build.BRAND.equalsIgnoreCase("xiaomi")) {
             new MaterialDialog.Builder(MainRecordingActivity.this).title("Enable AutoStart")
@@ -360,18 +366,6 @@ public class MainRecordingActivity extends AppCompatActivity {
                         }
                     })
                     .show();
-        }
-    }
-
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-    public static void setStatusBarGradiant(Activity activity) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            Window window = activity.getWindow();
-            Drawable background = activity.getResources().getDrawable(R.drawable.gradient_3);
-            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-            window.setStatusBarColor(activity.getResources().getColor(android.R.color.transparent));
-            window.setNavigationBarColor(activity.getResources().getColor(android.R.color.transparent));
-            window.setBackgroundDrawable(background);
         }
     }
 }

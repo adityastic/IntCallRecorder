@@ -10,6 +10,7 @@ import android.net.wifi.WifiManager;
 import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.util.Log;
+
 import com.adityagupta.nxtvisioncallrecorder.utils.Preferences;
 import com.adityagupta.nxtvisioncallrecorder.utils.asyncs.UploadFileAsync;
 import com.adityagupta.nxtvisioncallrecorder.utils.sqlite.DBHelper;
@@ -26,17 +27,14 @@ import java.util.Date;
 public class CallRecordReceiver extends PhoneCallReceiver {
 
     private static final String TAG = CallRecordReceiver.class.getSimpleName();
-
-    private static MediaRecorder recorder;
-    private static File audiofile;
-    private static boolean isRecordStarted = false;
-
     static long starttime;
     static long endtime;
-
     static String date, time;
     static int uniID;
     static String imei;
+    private static MediaRecorder recorder;
+    private static File audiofile;
+    private static boolean isRecordStarted = false;
 
     @Override
     protected void onIncomingCallReceived(Context context, String number, Date start) {
@@ -49,7 +47,7 @@ public class CallRecordReceiver extends PhoneCallReceiver {
 
     @Override
     protected void onIncomingCallEnded(Context context, String number, Date start, Date end) {
-        stopRecord(context,number);
+        stopRecord(context, number);
     }
 
     @Override
@@ -59,7 +57,7 @@ public class CallRecordReceiver extends PhoneCallReceiver {
 
     @Override
     protected void onOutgoingCallEnded(Context context, String number, Date start, Date end) {
-        stopRecord(context,number);
+        stopRecord(context, number);
     }
 
     @Override
@@ -130,7 +128,7 @@ public class CallRecordReceiver extends PhoneCallReceiver {
             wifiManager.setWifiEnabled(true);
     }
 
-    private void stopRecord(Context context,String number) {
+    private void stopRecord(Context context, String number) {
         try {
             if (recorder != null && isRecordStarted) {
                 releaseMediaRecorder();
@@ -140,7 +138,7 @@ public class CallRecordReceiver extends PhoneCallReceiver {
                 endtime = Calendar.getInstance().getTime().getTime();
                 long timeDiff = (endtime - starttime) / 1000;
 
-                storeCallInDatabase(context,timeDiff,number);
+                storeCallInDatabase(context, timeDiff, number);
 
 
                 Log.i(TAG, "record stop");
@@ -158,7 +156,7 @@ public class CallRecordReceiver extends PhoneCallReceiver {
         contentValues.put("time", time);
         contentValues.put("date", date);
         contentValues.put("number", number);
-        contentValues.put("dialtime", (int)timeDiff);
+        contentValues.put("dialtime", (int) timeDiff);
         contentValues.put("recording", "/sdcard/.nxtvision/" + audiofile.getName());
 
         SQLiteDatabase writeableDatabase = DBHelper.dbHelper.getWritableDatabase();
@@ -185,9 +183,8 @@ public class CallRecordReceiver extends PhoneCallReceiver {
                             cursor.getString(cursor.getColumnIndex("time")));
                 } while (cursor.moveToNext());
             }
-        }else
-        {
-            Log.e("License Expired","TRUE");
+        } else {
+            Log.e("License Expired", "TRUE");
         }
     }
 //
@@ -210,8 +207,8 @@ public class CallRecordReceiver extends PhoneCallReceiver {
             String dir_path = ".nxtvision";
             String dir_name = Environment.getExternalStorageDirectory().getPath();
             int output_format = MediaRecorder.OutputFormat.MPEG_4;
-            int audio_source = MediaRecorder.AudioEncoder.HE_AAC;
-            int audio_encoder = MediaRecorder.AudioSource.VOICE_CALL;
+            int audio_source = MediaRecorder.AudioSource.VOICE_CALL;
+            int audio_encoder = MediaRecorder.AudioEncoder.HE_AAC;
 
             File sampleDir = new File(dir_name + "/" + dir_path);
 
@@ -226,7 +223,7 @@ public class CallRecordReceiver extends PhoneCallReceiver {
             }
 
 
-            String prefix = imei.substring(imei.length() - 4, imei.length()) + "_" + uniID + "_" + date + "_" + time;
+            String prefix = imei.substring(imei.length() - 4) + "_" + uniID + "_" + date + "_" + time;
 
             String suffix = "";
             switch (output_format) {

@@ -1,61 +1,61 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
-    app:cardCornerRadius="12.0dip"
-    app:cardElevation="8.0dip"
-    android:id="@+id/card_id_acc"
-    app:cardPreventCornerOverlap="false"
-    app:cardUseCompatPadding="true">
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/card_id_acc"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        app:cardCornerRadius="12.0dip"
+        app:cardElevation="8.0dip"
+        app:cardPreventCornerOverlap="false"
+        app:cardUseCompatPadding="true">
 
     <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@drawable/gradient_6"
-        android:orientation="vertical"
-        android:padding="18dp">
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/gradient_6"
+            android:orientation="vertical"
+            android:padding="18dp">
 
         <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
-
-            <LinearLayout
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                android:orientation="vertical">
+
+            <LinearLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
 
                 <ImageView
-                    android:id="@+id/header_icon"
-                    android:layout_width="36dip"
-                    android:layout_height="36dip"
-                    android:layout_marginTop="4.0dip"
-                    android:src="@drawable/ic_acc" />
+                        android:id="@+id/header_icon"
+                        android:layout_width="36dip"
+                        android:layout_height="36dip"
+                        android:layout_marginTop="4.0dip"
+                        android:src="@drawable/ic_acc" />
 
                 <TextView
-                    android:id="@+id/header_title"
-                    android:layout_width="0.0dip"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_marginStart="8.0dip"
-                    android:layout_weight="1.0"
-                    android:gravity="center"
-                    android:text="Accessibility Check"
-                    android:textColor="?android:textColorPrimaryInverse"
-                    android:textSize="20.0sp" />
+                        android:id="@+id/header_title"
+                        android:layout_width="0.0dip"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_marginStart="8.0dip"
+                        android:layout_weight="1.0"
+                        android:gravity="center"
+                        android:text="Accessibility Check"
+                        android:textColor="?android:textColorPrimaryInverse"
+                        android:textSize="20.0sp" />
 
             </LinearLayout>
 
             <TextView
-                android:id="@+id/header_summary"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10.0dip"
-                android:lineSpacingExtra="8.0sp"
-                android:text="Grant Accessibility permission in order for the app to work in background."
-                android:textColor="?android:textColorPrimaryInverse"
-                android:textSize="14.0sp" />
+                    android:id="@+id/header_summary"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10.0dip"
+                    android:lineSpacingExtra="8.0sp"
+                    android:text="Grant Accessibility permission in order for the app to work in background."
+                    android:textColor="?android:textColorPrimaryInverse"
+                    android:textSize="14.0sp" />
         </LinearLayout>
     </LinearLayout>
-</android.support.v7.widget.CardView>
+</androidx.cardview.widget.CardView>

@@ -1,15 +1,18 @@
 package com.adityagupta.nxtvisioncallrecorder.application;
 
 import android.app.Application;
+
 import com.adityagupta.nxtvisioncallrecorder.R;
 import com.adityagupta.nxtvisioncallrecorder.utils.typeface.TypefaceUtil;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
+
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
 
 
 public class ApplicationActivity extends Application {
-    public static RequestQueue requestQueue ;
+    public static RequestQueue requestQueue;
+
     @Override
     public void onCreate() {
         super.onCreate();

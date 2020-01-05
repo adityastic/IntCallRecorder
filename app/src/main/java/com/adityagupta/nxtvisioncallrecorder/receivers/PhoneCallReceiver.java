@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.telephony.TelephonyManager;
 import android.util.Log;
+
 import com.adityagupta.nxtvisioncallrecorder.activities.MainRecordingActivity;
 
 import java.util.Date;
