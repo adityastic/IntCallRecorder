@@ -26,7 +26,9 @@ import androidx.core.app.ActivityCompat;
 import com.adityagupta.nxtvisioncallrecorder.MyAccessibilityService;
 import com.adityagupta.nxtvisioncallrecorder.R;
 import com.adityagupta.nxtvisioncallrecorder.utils.Preferences;
+import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.afollestad.materialdialogs.Theme;
 
 import static com.adityagupta.nxtvisioncallrecorder.utils.Preferences.checkLicense;
 
