@@ -1,0 +1,1 @@
+![Build CI](https://github.com/adityastic/IntCallRecorder/workflows/Build%20CI/badge.svg)
