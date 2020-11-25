@@ -1,12 +1,12 @@
-#!/bin/sh
+#!/bin/bash
 
 git config --global user.name "Aditya Gupta"
 git config --global user.email "adityaofficialgupta@gmail.com"
 
-git clone https://adityastic:$GITHUB_KEY@github.com/adityastic/AndroidAppReleases
+git clone https://adityastic:$PAT@github.com/adityastic/AndroidAppReleases
 cd AndroidAppReleases
 
-rm -rf ${TRAVIS_REPO_SLUG#*/}*
+rm -rf ${GITHUB_REPOSITORY#*/}*
 
 find ../app/build/outputs -type f -name '*.apk' -exec cp -v {} . \;
 
@@ -14,9 +14,9 @@ git checkout --orphan temporary
 
 for file in app*; do
     if [[ $file != *"unsigned"* ]];then
-        mv $file ${TRAVIS_REPO_SLUG#*/}-${file#*-}
-        git add ${TRAVIS_REPO_SLUG#*/}-${file#*-}
-        git commit -am "Update ${TRAVIS_REPO_SLUG#*/}-${file#*-} ($(date +%Y-%m-%d.%H:%M:%S))"
+        mv $file ${GITHUB_REPOSITORY#*/}-${file#*-}
+        git add ${GITHUB_REPOSITORY#*/}-${file#*-}
+        git commit -am "Update ${GITHUB_REPOSITORY#*/}-${file#*-} ($(date +%Y-%m-%d.%H:%M:%S))"
     fi
 done
 

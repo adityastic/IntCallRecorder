@@ -23,3 +23,9 @@ jobs:
       run: chmod +x gradlew
     - name: Build with Gradle
       run: ./gradlew build --stacktrace
+    - name: Deploy to Repo
+      if: github.event_name == 'push'
+      run: ./scripts/upload-app.sh
+      env:
+        PAT: ${{ secrets.PAT }}
+
