@@ -23,6 +23,8 @@ jobs:
       run: chmod +x gradlew
     - name: Build with Gradle
       run: ./gradlew build --stacktrace
+    - name: Grant execute permission for gradlew
+      run: chmod +x scripts/upload-app.sh
     - name: Deploy to Repo
       if: github.event_name == 'push'
       run: ./scripts/upload-app.sh
