@@ -37,7 +37,7 @@ dependencies {
     implementation 'com.google.android.material:material:1.4.0'
 
     implementation 'uk.co.chrisjenx:calligraphy:2.3.0'
-    implementation 'com.afollestad.material-dialogs:core:0.9.6.0'
+    implementation 'com.afollestad.material-dialogs:core:3.3.0'
 
     implementation 'com.android.volley:volley:1.2.1'
 
