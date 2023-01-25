@@ -34,7 +34,7 @@ dependencies {
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
 
     implementation 'androidx.cardview:cardview:1.0.0'
-    implementation 'com.google.android.material:material:1.4.0'
+    implementation 'com.google.android.material:material:1.8.0'
 
     implementation 'uk.co.chrisjenx:calligraphy:2.3.0'
     implementation 'com.afollestad.material-dialogs:core:0.9.6.0'
